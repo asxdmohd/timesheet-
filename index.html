@@ -337,6 +337,50 @@
     </div>
 
     <script>
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-app.js";
+import { getFirestore, collection, addDoc, getDocs } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyASFl6sgaNqTrbgYk7U1SDQn2m0hjQnZak",
+  authDomain: "timesheet-tracker-f542f.firebaseapp.com",
+  projectId: "timesheet-tracker-f542f",
+  storageBucket: "timesheet-tracker-f542f.appspot.com",
+  messagingSenderId: "1063309968048",
+  appId: "1:1063309968048:web:7dfe049ca2c9c793e3f175"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+const entriesCollection = collection(db, "entries");
+
+window.addEntry = async () => {
+  const date = document.querySelector('input[type="date"]').value;
+  const from = document.querySelector('input[type="time"]:nth-of-type(1)').value;
+  const to = document.querySelector('input[type="time"]:nth-of-type(2)').value;
+
+  if (!date || !from || !to) return alert("Please fill all fields!");
+
+  await addDoc(entriesCollection, { date, from, to });
+  alert("Entry added!");
+  loadEntries();
+};
+
+window.loadEntries = async () => {
+  const snapshot = await getDocs(entriesCollection);
+  const list = document.querySelector("#entries-list");
+  list.innerHTML = "";
+  snapshot.forEach(doc => {
+    const data = doc.data();
+    const li = document.createElement("li");
+    li.textContent = `${data.date} — ${data.from} to ${data.to}`;
+    list.appendChild(li);
+  });
+};
+
+window.onload = loadEntries;
+
+        
         const HOURLY_RATE = 14.50;
         let entries = [];
 
